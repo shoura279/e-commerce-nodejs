@@ -37,9 +37,19 @@ const subCategoryScehma = new Schema(
       required: true,
     },
   },
-  { timestamps: true },
-)
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 
+  },
+)
+// virtiul
+subCategoryScehma.virtual('brands', {
+  ref: 'Brand',
+  localField: "_id",
+  foreignField: "brandId"
+})
 // export const subCategoryModel = mongoose.models('subCategory') || mongoose.model('Catgeory', subCategoryScehma)
 export const subCategoryModel =
   model.subCategory || mongoose.model('subCategory', subCategoryScehma)

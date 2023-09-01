@@ -3,6 +3,7 @@ import { categoryModel } from '../../../DB/Models/category.model.js'
 import { customAlphabet } from 'nanoid'
 import cloudinary from '../../utils/coludinaryConfigrations.js'
 import { subCategoryModel } from '../../../DB/Models/subCategory.model.js'
+
 const nanoid = customAlphabet('123456_=!ascbhdtel', 5)
 
 export const createSubCategory = async (req, res, next) => {
@@ -61,4 +62,57 @@ export const getAllSubCategories = async (req, res, next) => {
   ])
   console.log(subCat)
   res.status(200).json({ message: 'Done', subCat })
+}
+
+//===================== updateSubCategory =====================//
+export const updateSubcategory = async (req, res, next) => {
+  // get data from req
+  const { id } = req.params;
+  // check subcategory existence
+  const isExist = await subCategoryModel.findById(id)
+  if (!isExist) return next(new Error(`not exist`, { cause: 404 }))
+  // check name exist
+  if (req.body.name) {
+    const isNameExsit = await subCategoryModel.findOne({
+      name: req.body.name,
+      _id: { $ne: req.params.id },
+    });
+    if (isNameExsit) {
+      return next(new ErrorClass("name already exist", { cause: 409 }))
+    }
+    req.body.slug = slugify(req.body.name)
+  }
+  // upload image
+  if (req.file) {
+    const { secure_url, public_id } = await cloudinary.uploader.upload(
+      req.file.path,
+      { folder: "subCategory" }
+    );
+    req.body.Image = { secure_url, public_id }
+  }
+  // update to db
+  const subCategory = await subCategoryModel.findByIdAndUpdate(
+    req.params.id,
+    req.body
+  );
+  // delet old image
+  if (req.file) {
+    await cloudinary.uploader.destroy(subCategory.image.public_id);
+  }
+  // send response
+  return res.status(200).json({ message: "done", subCategory });
+};
+//===================== delete subcategory =====================//
+export const deleteSubcategory = async (req, res, next) => {
+  const subcategory = await subCategoryModel.findByIdAndDelete(req.params.id);
+  if (!subcategory) {
+    return next(new Error('not found', { cause: 404 }))
+  }
+  await cloudinary.uploader.destroy(subcategory.Image.public_id);
+
+  return res.status(200).json({ message: "done" });
+};
+//==================== get all subcategory =====================//
+export const getWithBrand = async (req, res, next) => {
+  const result = await subCategoryModel.find().populate({ path: 'brands', select: 'name' });
 }
