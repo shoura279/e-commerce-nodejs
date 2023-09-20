@@ -1,8 +1,6 @@
-import mongoose, { Schema, model } from 'mongoose' // err
-// import mongoose from 'mongoose'
-// mongoose.models // right
+import  mongoose from 'mongoose' // err
 
-const categoryScehma = new Schema(
+const categoryScehma = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -28,7 +26,7 @@ const categoryScehma = new Schema(
     },
     customId: String,
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false, // TODO: convert to true after usermodel generation
     },
@@ -46,6 +44,7 @@ categoryScehma.virtual('subCategories', {
   localField: '_id',
 })
 
-// export const categoryModel = mongoose.models('Category') || mongoose.model('Catgeory', categoryScehma)
-export const categoryModel =
-  model.Category || mongoose.model('Catgeory', categoryScehma)
+export const categoryModel = mongoose.models.Catgeory  || mongoose.model('Catgeory', categoryScehma)
+
+
+

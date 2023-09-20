@@ -1,8 +1,6 @@
-import mongoose, { Schema, model } from 'mongoose' // err
-// import mongoose from 'mongoose'
-// mongoose.models // right
+import mongoose from 'mongoose'
 
-const subCategoryScehma = new Schema(
+const subCategoryScehma = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -27,29 +25,35 @@ const subCategoryScehma = new Schema(
     },
     customId: String,
     createdBy: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: false, // TODO: convert to true after usermodel generation
     },
     categoryId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Catgeory',
+      type: mongoose.Schema.Types.ObjectId,
+      refPath: 'docModel',
       required: true,
+    },
+    docModel: {
+      type: String,
+      required: true,
+      enum: ['Catgeory', 'Brand'],
     },
   },
   {
     timestamps: true,
+    toObject: { virtuals: true },
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
-
   },
 )
-// virtiul
+
 subCategoryScehma.virtual('brands', {
   ref: 'Brand',
-  localField: "_id",
-  foreignField: "brandId"
+  foreignField: 'subCategoryId',
+  localField: '_id',
+  // justOne: true,
 })
-// export const subCategoryModel = mongoose.models('subCategory') || mongoose.model('Catgeory', subCategoryScehma)
+
 export const subCategoryModel =
-  model.subCategory || mongoose.model('subCategory', subCategoryScehma)
+  mongoose.models.subCategory ||
+  mongoose.model('subCategory', subCategoryScehma)

@@ -1,11 +1,12 @@
 
-* create models
-  * category model
-  * subCategory model
-  * brand model
 
-* create category
-* create subaCategory
-* update category
-* delete category
-* get all categories ( using virtual )
+* hooks 
+* authorization
+* coupon model
+* add coupon
+
+* cart model
+* add to cart
+
+
+ 

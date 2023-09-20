@@ -3,9 +3,10 @@ import { categoryModel } from '../../../DB/Models/category.model.js'
 import { customAlphabet } from 'nanoid'
 import cloudinary from '../../utils/coludinaryConfigrations.js'
 import { subCategoryModel } from '../../../DB/Models/subCategory.model.js'
-import { log } from 'console'
+import { brandModel } from '../../../DB/Models/brand.model.js'
 const nanoid = customAlphabet('123456_=!ascbhdtel', 5)
 
+// ========================== create category =======================
 export const createCategory = async (req, res, next) => {
   // data
   const { name } = req.body
@@ -26,6 +27,7 @@ export const createCategory = async (req, res, next) => {
       folder: `${process.env.PROJECT_FOLDER}/Categories/${customId}`,
     },
   )
+  req.imagePath = `${process.env.PROJECT_FOLDER}/Categories/${customId}`
 
   const categoryObject = {
     name,
@@ -35,6 +37,9 @@ export const createCategory = async (req, res, next) => {
   }
 
   const categoryDb = await categoryModel.create(categoryObject)
+  req.failedDocument = { model: categoryModel, _id: categoryDb._id }
+  const x = 8
+  x = 9
 
   if (!categoryDb) {
     await cloudinary.uploader.destroy(public_id)
@@ -107,11 +112,16 @@ export const deleteCategroy = async (req, res, next) => {
   const deleteRelatedSubCategories = await subCategoryModel.deleteMany({
     categoryId,
   })
-  // console.log(deleteRelatedSubCategories.deletedCount)
   if (!deleteRelatedSubCategories.deletedCount) {
     return next(new Error('delete subCate fail', { cause: 400 }))
   }
-  // TODO: delet the related brand
+  const deleteRelatedBrands = await brandModel.deleteMany({
+    categoryId,
+  })
+  // console.log(deleteRelatedSubCategories.deletedCount)
+  if (!deleteRelatedBrands.deletedCount) {
+    return next(new Error('delete brands fail', { cause: 400 }))
+  }
   // TODO: delet the related products
 
   // host
@@ -125,16 +135,22 @@ export const deleteCategroy = async (req, res, next) => {
   res.status(200).json({ message: 'Done' })
 }
 
+// ========================== get all category =======================
 export const getAllCategories = async (req, res, next) => {
   const Categories = await categoryModel.find().populate([
     {
       path: 'subCategories',
       select: 'name',
+      // nested populate
+      populate: [
+        {
+          path: 'brands',
+          select: 'name',
+        },
+      ],
     },
   ])
+  //====================  execlude id ==============
   console.log(Categories)
   res.status(200).json({ message: 'Done', Categories })
 }
-
-// cursor
-// virtual populate

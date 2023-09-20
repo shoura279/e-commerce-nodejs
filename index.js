@@ -7,5 +7,3 @@ import { initiateApp } from './src/initiateApp.js'
 
 const app = express()
 initiateApp(express, app)
-
-console.log(path.resolve('./config/config.env'))

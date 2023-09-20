@@ -1,7 +1,7 @@
 import { userModel } from '../../DB/Models/user.model.js'
 import { generateToken, verifyToken } from '../utils/tokenFunctions.js'
 
-export const isAuth = () => {
+export const isAuth = (accessRoles) => {
   return async (req, res, next) => {
     try {
       const { authorization } = req.headers
@@ -9,7 +9,7 @@ export const isAuth = () => {
         return next(new Error('Please login first', { cause: 400 }))
       }
 
-      if (!authorization.startsWith('Saraha')) {
+      if (!authorization.startsWith('ecomm__')) {
         return next(new Error('invalid token prefix', { cause: 400 }))
       }
 
@@ -22,11 +22,15 @@ export const isAuth = () => {
         })
 
         const findUser = await userModel.findById(
-          decodedData.id,
-          'email username',
+          decodedData._id,
+          'email username role',
         )
         if (!findUser) {
           return next(new Error('Please SignUp', { cause: 400 }))
+        }
+        //================== Authorization==================
+        if (!accessRoles.includes(findUser.role)) {
+          return next(new Error('UnAuthorized to access', { cause: 401 }))
         }
         req.authUser = findUser
         next()

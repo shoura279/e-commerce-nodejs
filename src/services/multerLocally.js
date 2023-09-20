@@ -2,6 +2,7 @@ import multer from 'multer'
 import fs from 'fs'
 import path from 'path'
 import { customAlphabet } from 'nanoid'
+import { allowedExtensions } from '../utils/allowedExtensions.js'
 const nanoid = customAlphabet('123456_=!ascbhdtel', 5)
 
 
