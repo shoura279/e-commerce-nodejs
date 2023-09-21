@@ -38,9 +38,7 @@ export const createCategory = async (req, res, next) => {
 
   const categoryDb = await categoryModel.create(categoryObject)
   req.failedDocument = { model: categoryModel, _id: categoryDb._id }
-  const x = 8
-  x = 9
-
+  
   if (!categoryDb) {
     await cloudinary.uploader.destroy(public_id)
     await cloudinary.api.delete_folder(

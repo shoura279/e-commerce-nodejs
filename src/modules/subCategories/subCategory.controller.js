@@ -37,7 +37,7 @@ export const createSubCategory = async (req, res, next) => {
     Image: { secure_url, public_id },
     customId,
     categoryId,
-    docModel:'Catgeory'
+    docModel: 'Catgeory'
   }
 
   const subcategoryDb = await subCategoryModel.create(subcategoryObject)
@@ -62,4 +62,42 @@ export const getAllSubCategories = async (req, res, next) => {
   ])
   console.log(subCat)
   res.status(200).json({ message: 'Done', subCat })
+}
+
+export const updateSubcategory = async (req, res, next) => {
+  // data
+  const { name } = req.body
+  const { subcategoryId } = req.query
+
+  const subCategory = await subCategoryModel.findById(subcategoryId)
+  if (name) {
+    const isNameDupliacte = await subCategoryModel.findOne({ name, _id: { $ne: subcategoryId } })
+    if (isNameDupliacte) {
+      return next(new Error('subcategory name is duplicated', { cause: 409 }))
+    }
+    subCategory.name = name
+  }
+  const slug = slugify(name, '_')
+  if (req.file) {
+    const { secure_url } = await cloudinary.uploader.upload(
+      req.file.path,
+      {
+        public_id: subCategory.Image.public_id
+      },
+    )
+    subCategory.image.secure_url = secure_url
+  }
+  const data = await subCategory.save()
+  return res.status(200).json({ message: "done", data })
+}
+
+export const deleteSubcategory = async (req, res, next) => {
+  const { subcategoryId } = req.query
+  const subCategory = await subCategoryModel.findByIdAndDelete(subcategoryId)
+  if (!subCategory) {
+    return next(new Error('INvalid subcategoryId', { cause: 400 }))
+  }
+  const category = await categoryModel.findById(subCategory.categoryId)
+  await cloudinary.api.delete_resources_by_prefix(`${process.env.PROJECT_FOLDER}/Categories/${category.customId}/SubCategories/${subCategory.customId}`)
+  return res.status(200).json({ message: "done" })
 }
