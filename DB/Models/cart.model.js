@@ -24,11 +24,6 @@ const cartSchema = new mongoose.Schema(
                 }
             }
         ],
-        subTotal: {
-            type: Number,
-            required: true,
-            default: 0
-        }
     },
     {
         timestamps: true,
@@ -36,4 +31,4 @@ const cartSchema = new mongoose.Schema(
 )
 
 
-export const cartModel = mongoose.models.cart || mongoose.model('cart', cartSchema)
+export const cartModel = /*mongoose.models.Cart || */mongoose.model('Cart', cartSchema)
