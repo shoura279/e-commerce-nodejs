@@ -5,7 +5,7 @@ import * as cc from './coupon.controller.js'
 import { validationCoreFunction } from '../../middlewares/validation.js'
 import { addCouponSchema } from './coupon.validationSchemas.js'
 import { isAuth } from '../../middlewares/auth.js'
-import { systemRoles } from '../../utils/systemRoles.js'
+import { systemRoles } from '../../utils/enums.js'
 const router = Router()
 
 

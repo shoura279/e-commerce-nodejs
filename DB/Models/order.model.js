@@ -17,6 +17,7 @@ const orderSchema = new Schema({
   coupon: {
     id: { type: Types.ObjectId, ref: 'Coupon' },
     name: String,
+    discount: Number
   },
   status: {
     type: String,
@@ -30,8 +31,16 @@ const orderSchema = new Schema({
   }
 },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 )
+// virtual
+orderSchema.virtual('finalPrice').get(function () {
+  return this.coupon
+    ? Number.parseFloat(this.price - (this.price * this.coupon.discount) / 100).toFixed(2)
+    : this.price
+})
 // model
 export const orderModel = mongoose.models.Order || model('Order', orderSchema)

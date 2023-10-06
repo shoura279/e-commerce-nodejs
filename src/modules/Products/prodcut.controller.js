@@ -5,7 +5,6 @@ import { subCategoryModel } from '../../../DB/Models/subCategory.model.js'
 import cloudinary from '../../utils/coludinaryConfigrations.js'
 import { productModel } from '../../../DB/Models/product.model.js'
 import { customAlphabet } from 'nanoid'
-import { pagination } from '../../utils/pagination.js'
 import { Apifeatures } from '../../utils/apiFeatures.js'
 const nanoid = customAlphabet('123456_=!ascbhdtel', 5)
 

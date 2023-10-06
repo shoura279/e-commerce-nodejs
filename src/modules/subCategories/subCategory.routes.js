@@ -6,7 +6,7 @@ import * as sc from './subCategory.controller.js'
 import { validationCoreFunction } from '../../middlewares/validation.js'
 import { createSubcategorySchema, updateSubcategorySchema } from './subCategory.validationSchemas.js'
 import { isAuth } from '../../middlewares/auth.js'
-import { systemRoles } from '../../utils/systemRoles.js'
+import { systemRoles } from '../../utils/enums.js'
 
 const router = Router()
 router.get('/', asyncHandler(sc.getAllSubCategories))

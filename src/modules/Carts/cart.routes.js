@@ -4,8 +4,8 @@ import { asyncHandler } from '../../utils/errorhandling.js'
 import * as cc from './cart.controller.js'
 import { validationCoreFunction } from '../../middlewares/validation.js'
 import { isAuth } from '../../middlewares/auth.js'
-import { systemRoles } from '../../utils/systemRoles.js'
-import { cartSchema, removeProductSchema } from './cart.validationSchemas.js'
+import { systemRoles } from '../../utils/enums.js'
+import { cartSchema, removeProductSchema } from './cart.validation.js'
 const router = Router()
 
 

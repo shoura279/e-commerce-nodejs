@@ -1,7 +1,7 @@
-import { systemRoles } from "../../utils/systemRoles.js";
+import { systemRoles } from "../../utils/enums.js";
 
 
 
 export const categoryRoles = {
-    CREAT_CATEGPRY: [systemRoles.ADMIN, systemRoles.SUPER_ADMIN]
+  CREAT_CATEGPRY: [systemRoles.ADMIN, systemRoles.SUPER_ADMIN]
 }

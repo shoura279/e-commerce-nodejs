@@ -21,10 +21,21 @@ export const signUp = async (req, res, next) => {
   if (isEmailDuplicate) {
     return next(new Error('email is already exist', { cause: 400 }))
   }
+  // hash password => from hooks 
+  const user = new userModel({
+    userName,
+    email,
+    password,
+    age,
+    gender,
+    phoneNumber,
+    address,
+  })
+  const savedUser = await user.save()
   const token = generateToken({
     payload: {
       email,
-      _id
+      _id: savedUser._id
     },
     signature: process.env.CONFIRMATION_EMAIL_TOKEN,
     expiresIn: '1h',
@@ -45,17 +56,7 @@ export const signUp = async (req, res, next) => {
     return next(new Error('fail to sent confirmation email', { cause: 400 }))
   }
 
-  // hash password => from hooks 
-  const user = new userModel({
-    userName,
-    email,
-    password,
-    age,
-    gender,
-    phoneNumber,
-    address,
-  })
-  const savedUser = await user.save()
+
   res.status(201).json({ message: 'Done', savedUser })
 }
 

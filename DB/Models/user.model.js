@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose'
 import pkg from 'bcrypt'
-import { systemRoles } from '../../src/utils/systemRoles.js'
+import { systemRoles } from '../../src/utils/enums.js'
 const userSchema = new Schema(
   {
     userName: {

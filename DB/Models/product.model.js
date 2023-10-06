@@ -87,12 +87,14 @@ const productSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   },
 )
 productSchema.virtual('finalPrice').get(function () {
   if (this.price) {
     return Number.parseFloat(
-      this.price - (this.price * this.discount || 0) / 100
+      this.price - (this.price * this.appliedDiscount || 0) / 100
     ).toFixed(2)
   }
 })

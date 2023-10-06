@@ -1,5 +1,5 @@
 import joi from "joi";
-import { generalFields } from "../../middlewares/validation,js";
+import { generalFields } from "../../middlewares/validation.js";
 // cart schema
 export const cartSchema = {
     body: joi.object({

@@ -19,6 +19,7 @@ export const initiateApp = (express, app) => {
   app.use('/auth', allRouter.authRouter)
   app.use('/coupon', allRouter.couponRouter)
   app.use('/cart', allRouter.cartRouter)
+  app.use('/order', allRouter.orderRouter)
 
   app.use(globalResponse)
 
