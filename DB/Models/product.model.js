@@ -89,6 +89,16 @@ const productSchema = new mongoose.Schema(
     timestamps: true,
   },
 )
+productSchema.virtual('finalPrice').get(function () {
+  if (this.price) {
+    return Number.parseFloat(
+      this.price - (this.price * this.discount || 0) / 100
+    ).toFixed(2)
+  }
+})
 
+productSchema.methods.inStock = function (requiredQuantity) {
+  return this.stock >= requiredQuantity ? true : false
+}
 export const productModel =
   mongoose.models.Product || mongoose.model('Product', productSchema)

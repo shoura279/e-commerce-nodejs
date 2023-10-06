@@ -4,6 +4,7 @@ import { sendEmailService } from '../../services/sendEmailService.js'
 import { emailTemplate } from '../../utils/emailTemplate.js'
 import { generateToken, verifyToken } from '../../utils/tokenFunctions.js'
 import pkg from 'bcrypt'
+import { cartModel } from '../../../DB/Models/cart.model.js'
 //======================================== SignUp ===========================
 export const signUp = async (req, res, next) => {
   const {
@@ -20,28 +21,29 @@ export const signUp = async (req, res, next) => {
   if (isEmailDuplicate) {
     return next(new Error('email is already exist', { cause: 400 }))
   }
-  // const token = generateToken({
-  //   payload: {
-  //     email,
-  //   },
-  //   signature: process.env.CONFIRMATION_EMAIL_TOKEN,
-  //   expiresIn: '1h',
-  // })
-  // const conirmationlink = `${req.protocol}://${req.headers.host}/auth/confirm/${token}`
-  // const isEmailSent = sendEmailService({
-  //   to: email,
-  //   subject: 'Confirmation Email',
-  //   // message: `<a href=${conirmationlink}>Click here to confirm </a>`,
-  //   message: emailTemplate({
-  //     link: conirmationlink,
-  //     linkData: 'Click here to confirm',
-  //     subject: 'Confirmation Email',
-  //   }),
-  // })
+  const token = generateToken({
+    payload: {
+      email,
+      _id
+    },
+    signature: process.env.CONFIRMATION_EMAIL_TOKEN,
+    expiresIn: '1h',
+  })
+  const conirmationlink = `${req.protocol}://${req.headers.host}/auth/confirm/${token}`
+  const isEmailSent = sendEmailService({
+    to: email,
+    subject: 'Confirmation Email',
+    // message: `<a href=${conirmationlink}>Click here to confirm </a>`,
+    message: emailTemplate({
+      link: conirmationlink,
+      linkData: 'Click here to confirm',
+      subject: 'Confirmation Email',
+    }),
+  })
 
-  // if (!isEmailSent) {
-  //   return next(new Error('fail to sent confirmation email', { cause: 400 }))
-  // }
+  if (!isEmailSent) {
+    return next(new Error('fail to sent confirmation email', { cause: 400 }))
+  }
 
   // hash password => from hooks 
   const user = new userModel({
@@ -65,6 +67,7 @@ export const confirmEmail = async (req, res, next) => {
     token,
     signature: process.env.CONFIRMATION_EMAIL_TOKEN,
   })
+  await cartModel.create({ userId: decode._id })
   const user = await userModel.findOneAndUpdate(
     { email: decode?.email, isConfirmed: false },
     { isConfirmed: true },

@@ -1,11 +1,15 @@
 import * as allRouter from './modules/index.routes.js'
 import { connectionDB } from '../DB/connection.js'
 import { globalResponse } from './utils/errorhandling.js'
+import morgan from 'morgan'
 // import { userModel } from '../DB/Models/user.model.js'
 
 export const initiateApp = (express, app) => {
   const port = process.env.PORT || 5000
-
+  // morgan
+  if (process.env.NODE_ENV === 'dev') {
+    app.use(morgan('dev'))
+  }
   app.use(express.json())
   connectionDB()
   app.use(`/category`, allRouter.categoryRouter)
