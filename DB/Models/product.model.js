@@ -24,10 +24,6 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    priceAfterDiscount: {
-      type: Number,
-      default: 0,
-    },
 
     //====================== quantity ================
     stock: {
@@ -103,4 +99,4 @@ productSchema.methods.inStock = function (requiredQuantity) {
   return this.stock >= requiredQuantity ? true : false
 }
 export const productModel =
-  mongoose.models.Product || mongoose.model('Product', productSchema)
+  mongoose.model('Product', productSchema)

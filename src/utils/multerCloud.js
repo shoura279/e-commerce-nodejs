@@ -1,9 +1,9 @@
 import multer from 'multer'
-import { allowedExtensions } from '../utils/allowedExtensions.js'
+import { fileValidation } from './allowedExtensions.js'
 
-export const multerCloudFunction = (allowedExtensionsArr) => {
+export const fileUpload = (allowedExtensionsArr) => {
   if (!allowedExtensionsArr) {
-    allowedExtensionsArr = allowedExtensions.Image
+    allowedExtensionsArr = fileValidation.Image
   }
   //================================== Storage =============================
   const storage = multer.diskStorage({})

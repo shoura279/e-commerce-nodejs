@@ -85,8 +85,9 @@ export const updateSubcategory = async (req, res, next) => {
         public_id: subCategory.Image.public_id
       },
     )
-    subCategory.image.secure_url = secure_url
+    subCategory.Image.secure_url = secure_url
   }
+  subCategory.slug = slug
   const data = await subCategory.save()
   return res.status(200).json({ message: "done", data })
 }
@@ -98,6 +99,11 @@ export const deleteSubcategory = async (req, res, next) => {
     return next(new Error('INvalid subcategoryId', { cause: 400 }))
   }
   const category = await categoryModel.findById(subCategory.categoryId)
-  await cloudinary.api.delete_resources_by_prefix(`${process.env.PROJECT_FOLDER}/Categories/${category.customId}/SubCategories/${subCategory.customId}`)
+  await cloudinary.api.delete_resources_by_prefix(
+    `${process.env.PROJECT_FOLDER}/Categories/${category.customId}/SubCategories/${subCategory.customId}`
+  )
+  await cloudinary.api.delete_folder(
+    `${process.env.PROJECT_FOLDER}/Categories/${category.customId}/SubCategories/${subCategory.customId}`
+  )
   return res.status(200).json({ message: "done" })
 }

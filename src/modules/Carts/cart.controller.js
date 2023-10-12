@@ -4,7 +4,7 @@ import { productModel } from "../../../DB/Models/product.model.js"
 
 // add to cart
 export const addToCart = async (req, res, next) => {
-  const userId = req.authUser._id
+  const userId = req.user._id
   const { productId, quantity } = req.body
   const productCheck = await productModel.findById(productId)
   if (!productCheck) {
@@ -31,7 +31,7 @@ export const addToCart = async (req, res, next) => {
 
 // get user cart
 export const userCart = async (req, res, next) => {
-  const cart = await cartModel.findOneAndDelete({ userId: req.authUser._id }).populate({
+  const cart = await cartModel.findOneAndDelete({ userId: req.user._id }).populate({
     path: 'products.productId',
     select: 'name '
   })
@@ -51,7 +51,7 @@ export const updateCart = async (req, res, next) => {
   // update product
   const cart = await cartModel.findOneAndUpdate(
     {
-      userId: req.authUser._id, 'products.productId': productId
+      userId: req.user._id, 'products.productId': productId
     }
     ,
     {
@@ -68,7 +68,7 @@ export const updateCart = async (req, res, next) => {
 // remove product from cart
 export const removeProduct = async (req, res, next) => {
   const cart = await cartModel.findOneAndUpdate(
-    { userId: req.authUser._id },
+    { userId: req.user._id },
     { $pull: { products: { productId: req.params.productId } } },
     { new: true }
   )

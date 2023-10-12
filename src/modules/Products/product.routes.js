@@ -1,27 +1,43 @@
 import { Router } from 'express'
-import { multerCloudFunction } from '../../services/multerCloud.js'
-import { allowedExtensions } from '../../utils/allowedExtensions.js'
+import { fileUpload } from '../../utils/multerCloud.js'
+import { fileValidation } from '../../utils/allowedExtensions.js'
 import { asyncHandler } from '../../utils/errorhandling.js'
 import * as pc from './prodcut.controller.js'
-import { validationCoreFunction } from '../../middlewares/validation.js'
-import {
-  addProductScheme,
-  updateProductScheme,
-} from './product.validationSchemas.js'
-const router = Router()
+import { isValid } from '../../middlewares/validation.js'
+import * as val from './product.validationSchemas.js'
+import { isAuth } from '../../middlewares/auth.js'
+import { roles } from '../../utils/enums.js'
 
+
+const router = Router()
+// get all product
+router.get('/', asyncHandler(pc.listProducts))
+
+// get specific product
+router.get('/:productId',
+  asyncHandler(pc.getSpecific)
+)
+// auth
+router.use(isAuth([roles.SUPER_ADMIN, roles.ADMIN]))
+// add product
 router.post(
   '/',
-  multerCloudFunction(allowedExtensions.Image).array('image', 2),
-  validationCoreFunction(addProductScheme),
+  fileUpload(fileValidation.Image).array('image', 2),
+  isValid(val.addProductScheme),
   asyncHandler(pc.addProduct),
 )
+
+// update product
 router.put(
   '/',
-  multerCloudFunction(allowedExtensions.Image).array('image', 2),
-  validationCoreFunction(updateProductScheme),
+  fileUpload(fileValidation.Image).array('image', 2),
+  isValid(val.updateProductScheme),
   asyncHandler(pc.updateProduct),
 )
 
-router.get('/', asyncHandler(pc.listProducts))
+// delete product
+router.delete(
+  '/',
+  asyncHandler(pc.deleteProduct)
+)
 export default router

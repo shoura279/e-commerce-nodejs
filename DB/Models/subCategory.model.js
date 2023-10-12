@@ -55,5 +55,5 @@ subCategoryScehma.virtual('brands', {
 })
 
 export const subCategoryModel =
-  mongoose.models.SubCategory ||
+  // mongoose.models.SubCategory ||
   mongoose.model('SubCategory', subCategoryScehma)

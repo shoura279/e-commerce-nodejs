@@ -42,4 +42,4 @@ const brandSchema = new mongoose.Schema(
 )
 
 
-export const brandModel = mongoose.models.Brand || mongoose.model('Brand', brandSchema)
+export const brandModel = mongoose.model('Brand', brandSchema)

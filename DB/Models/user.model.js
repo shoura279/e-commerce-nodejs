@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose'
 import pkg from 'bcrypt'
-import { systemRoles } from '../../src/utils/enums.js'
+import { roles } from '../../src/utils/enums.js'
 const userSchema = new Schema(
   {
     userName: {
@@ -23,8 +23,8 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      default: systemRoles.USER,
-      enum: [systemRoles.USER, systemRoles.ADMIN, systemRoles.SUPER_ADMIN],
+      default: roles.USER,
+      enum: [roles.USER, roles.ADMIN, roles.SUPER_ADMIN],
     },
     phoneNumber: {
       type: String,
@@ -58,12 +58,12 @@ const userSchema = new Schema(
 )
 
 // //====================================== document middleware =============================
-userSchema.pre('save', function () {
-  // console.log('=====================  pre save hook ========================');
-  // console.log(this)
-  this.password = pkg.hashSync(this.password, +process.env.SALT_ROUNDS)
-  // console.log(this)
-})
+// userSchema.pre('save', function () {
+//   // console.log('=====================  pre save hook ========================');
+//   // console.log(this)
+//   this.password = pkg.hashSync(this.password, +process.env.SALT_ROUNDS)
+//   // console.log(this)
+// })
 
 // userSchema.post('save', function () {
 //   console.log('=====================  post save hook ========================');

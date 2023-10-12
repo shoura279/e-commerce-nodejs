@@ -4,6 +4,7 @@ import { customAlphabet } from 'nanoid'
 import cloudinary from '../../utils/coludinaryConfigrations.js'
 import { subCategoryModel } from '../../../DB/Models/subCategory.model.js'
 import { brandModel } from '../../../DB/Models/brand.model.js'
+import { productModel } from '../../../DB/Models/product.model.js'
 const nanoid = customAlphabet('123456_=!ascbhdtel', 5)
 
 // ========================== create category =======================
@@ -38,7 +39,7 @@ export const createCategory = async (req, res, next) => {
 
   const categoryDb = await categoryModel.create(categoryObject)
   req.failedDocument = { model: categoryModel, _id: categoryDb._id }
-  
+
   if (!categoryDb) {
     await cloudinary.uploader.destroy(public_id)
     await cloudinary.api.delete_folder(
@@ -121,7 +122,12 @@ export const deleteCategroy = async (req, res, next) => {
     return next(new Error('delete brands fail', { cause: 400 }))
   }
   // TODO: delet the related products
-
+  const deleteRelatedProducts = await productModel.deleteMany({
+    categoryId,
+  })
+  if (!deleteRelatedProducts.deletedCount) {
+    return next(new Error('delete products fail', { cause: 400 }))
+  }
   // host
   await cloudinary.api.delete_resources_by_prefix(
     `${process.env.PROJECT_FOLDER}/Categories/${category.customId}`,

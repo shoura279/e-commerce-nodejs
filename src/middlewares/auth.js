@@ -13,12 +13,12 @@ export const isAuth = (accessRoles) => {
         return next(new Error('invalid token prefix', { cause: 400 }))
       }
 
-      const splitedToken = authorization.split(' ')[1]
+      const splitedToken = authorization.split('ecomm__')[1]
 
       try {
         const decodedData = verifyToken({
           token: splitedToken,
-          signature: process.env.SIGN_IN_TOKEN_SECRET,
+          signature: process.env.TOKEN_SIGNATURE,
         })
 
         const findUser = await userModel.findById(
@@ -32,7 +32,7 @@ export const isAuth = (accessRoles) => {
         if (!accessRoles.includes(findUser.role)) {
           return next(new Error('UnAuthorized to access', { cause: 401 }))
         }
-        req.authUser = findUser
+        req.user = findUser
         next()
       } catch (error) {
         // token  => search in db
@@ -46,9 +46,9 @@ export const isAuth = (accessRoles) => {
           const userToken = generateToken({
             payload: {
               email: user.email,
-              id: user._id,
+              _id: user._id,
             },
-            signature: process.env.SIGN_IN_TOKEN_SECRET,
+            signature: process.env.TOKEN_SIGNATURE,
             expiresIn: 20,
           })
 

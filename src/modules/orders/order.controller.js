@@ -14,7 +14,7 @@ export const createOrder = async (req, res, next) => {
   }
 
   // check cart
-  const cart = await cartModel.findOne({ userId: req.authUser._id })
+  const cart = await cartModel.findOne({ userId: req.user._id })
   const products = cart.products
   if (products.length < 0) {
     return next(new Error('cart empty!', { cause: 400 }))
@@ -42,7 +42,7 @@ export const createOrder = async (req, res, next) => {
 
   // create order
   const order = await orderModel.create({
-    user: req.authUser._id,
+    user: req.user._id,
     phone,
     address,
     coupon: {

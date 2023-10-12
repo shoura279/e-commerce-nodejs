@@ -1,64 +1,23 @@
-import mongoose from 'mongoose' // err
+import mongoose, { Schema, Types, model } from "mongoose";
 
-const couponScehma = new mongoose.Schema(
-  {
-    couponCode: {
-      type: String,
-      required: true,
-      trim: true,
-      lowercase: true,
-      unique: true
-    },
-    couponAmount: {
-      type: Number,
-      required: true
-    },
-    couponStatus: {
-      type: String,
-      default: 'valid',
-      enum: ['valid', 'expired']
-    },
-    fromDate: {
-      type: String,
-      required: true
-    },
-    toDate: {
-      type: String,
-      required: true
-    },
-    isPercentage: {
-      type: Boolean,
-      default: false
-    },
-    isFixedAmount: {
-      type: Boolean,
-      default: false
-    },
-    couponAssginedToUsers: [
-      {
-        userId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
-          required: true
-        },
-        maxUsage: {
-          type: Number,
-          required: true
-        },
-        usageCount: {
-          type: Number,
-          default: 0
-        }
-
-      }]
-
+const couponScehma = new Schema({
+  name: {
+    type: String,
+    required: true
   },
-  {
-    timestamps: true,
+  discount: {
+    type: Number,
+    required: true,
+    min: 1, max: 100
   },
-)
+  expierdAt: Number,
+  createdBy: {
+    type: Types.ObjectId,
+    ref: 'User', 
+    required: true
+  }
+}, { timestamps: true })
 
-export const couponModel =/* mongoose.models.Coupon || */mongoose.model('Coupon', couponScehma)
-
-
-
+export const couponModel =
+  mongoose.models.Coupon ||
+  model('Coupon', couponScehma)

@@ -20,12 +20,12 @@ export const generalFields = {
     })
     .required(),
   _id: joi.string().custom(validateObjectId),
-  file:joi.object({
-    size:joi.number()
+  file: joi.object({
+    size: joi.number()
   })
 }
 
-export const validationCoreFunction = (schema) => {
+export const isValid = (schema) => {
   return (req, res, next) => {
     const validationErrorArr = []
     for (const key of reqMethods) {

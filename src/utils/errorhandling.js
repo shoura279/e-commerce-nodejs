@@ -24,7 +24,7 @@ export const asyncHandler = (API) => {
       // }
       // await model.deleteMany({ _id: { $in: arr } })
 
-      return next(new Error('Fail', { cause: 500 }))
+      return next(new Error(err.message || err, { cause: 500 }))
     })
   }
 }
@@ -36,6 +36,6 @@ export const globalResponse = (err, req, res, next) => {
         .status(err['cause'])
         .json({ message: 'Validationerror', Errors: req.validationErrorArr })
     }
-    return res.status(err['cause'] || 500).json({ message: err.message })
+    return res.status(err['cause'] || 500).json({ message: err.message || err })
   }
 }

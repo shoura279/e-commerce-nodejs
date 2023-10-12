@@ -1,4 +1,4 @@
-import  mongoose from 'mongoose' // err
+import mongoose from 'mongoose' // err
 
 const categoryScehma = new mongoose.Schema(
   {
@@ -39,12 +39,12 @@ const categoryScehma = new mongoose.Schema(
 )
 
 categoryScehma.virtual('subCategories', {
-  ref: 'subCategory',
+  ref: 'SubCategory',
   foreignField: 'categoryId',
   localField: '_id',
 })
 
-export const categoryModel = mongoose.models.Catgeory  || mongoose.model('Catgeory', categoryScehma)
+export const categoryModel = mongoose.model('Catgeory', categoryScehma)
 
 
 

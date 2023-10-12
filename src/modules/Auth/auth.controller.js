@@ -1,12 +1,13 @@
 import { nanoid } from 'nanoid'
 import { userModel } from '../../../DB/Models/user.model.js'
-import { sendEmailService } from '../../services/sendEmailService.js'
+import sendEmail from '../../utils/sendEmailService.js'
 import { emailTemplate } from '../../utils/emailTemplate.js'
 import { generateToken, verifyToken } from '../../utils/tokenFunctions.js'
 import pkg from 'bcrypt'
 import { cartModel } from '../../../DB/Models/cart.model.js'
 //======================================== SignUp ===========================
 export const signUp = async (req, res, next) => {
+  // data from req
   const {
     userName,
     email,
@@ -16,16 +17,19 @@ export const signUp = async (req, res, next) => {
     phoneNumber,
     address,
   } = req.body
+
   // email check
   const isEmailDuplicate = await userModel.findOne({ email })
   if (isEmailDuplicate) {
     return next(new Error('email is already exist', { cause: 400 }))
   }
   // hash password => from hooks 
+  const hashPassword = pkg.hashSync(password, parseInt(process.env.SALT_ROUNDS))
+  // create user
   const user = new userModel({
     userName,
     email,
-    password,
+    password: hashPassword,
     age,
     gender,
     phoneNumber,
@@ -37,16 +41,17 @@ export const signUp = async (req, res, next) => {
       email,
       _id: savedUser._id
     },
-    signature: process.env.CONFIRMATION_EMAIL_TOKEN,
+    signature: process.env.TOKEN_SIGNATURE,
     expiresIn: '1h',
   })
-  const conirmationlink = `${req.protocol}://${req.headers.host}/auth/confirm/${token}`
-  const isEmailSent = sendEmailService({
+  const confirmationlink = `${req.protocol}://${req.headers.host}/auth/confirm/${token}`
+  // send email
+  const isEmailSent = await sendEmail({
     to: email,
     subject: 'Confirmation Email',
     // message: `<a href=${conirmationlink}>Click here to confirm </a>`,
-    message: emailTemplate({
-      link: conirmationlink,
+    html: emailTemplate({
+      link: confirmationlink,
       linkData: 'Click here to confirm',
       subject: 'Confirmation Email',
     }),
@@ -56,7 +61,7 @@ export const signUp = async (req, res, next) => {
     return next(new Error('fail to sent confirmation email', { cause: 400 }))
   }
 
-
+  // send reponse
   res.status(201).json({ message: 'Done', savedUser })
 }
 
@@ -66,7 +71,7 @@ export const confirmEmail = async (req, res, next) => {
   const { token } = req.params
   const decode = verifyToken({
     token,
-    signature: process.env.CONFIRMATION_EMAIL_TOKEN,
+    signature: process.env.TOKEN_SIGNATURE,
   })
   await cartModel.create({ userId: decode._id })
   const user = await userModel.findOneAndUpdate(
@@ -98,8 +103,7 @@ export const logIn = async (req, res, next) => {
       _id: user._id,
       role: user.role,
     },
-    signature: process.env.SIGN_IN_TOKEN_SECRET,
-    expiresIn: '1h',
+    signature: process.env.TOKEN_SIGNATURE,
   })
 
   const userUpdated = await userModel.findOneAndUpdate(
@@ -133,14 +137,14 @@ export const forgetPassword = async (req, res, next) => {
       email,
       sentCode: hashedCode,
     },
-    signature: process.env.RESET_TOKEN,
+    signature: process.env.TOKEN_SIGNATURE,
     expiresIn: '1h',
   })
   const resetPasswordLink = `${req.protocol}://${req.headers.host}/auth/reset/${token}`
-  const isEmailSent = sendEmailService({
+  const isEmailSent = await sendEmail({
     to: email,
     subject: 'Reset Password',
-    message: emailTemplate({
+    html: emailTemplate({
       link: resetPasswordLink,
       linkData: 'Click to Reset your password',
       subject: 'Reset Password Email',
@@ -159,13 +163,13 @@ export const forgetPassword = async (req, res, next) => {
       new: true,
     },
   )
-  res.status(200).json({ message: 'Done', userUpdates })
+  res.status(200).json({ message: 'Done', userUpdates, token })
 }
 
 //================================ reset password =================================
 export const resetPassword = async (req, res, next) => {
   const { token } = req.params
-  const decoded = verifyToken({ token, signature: process.env.RESET_TOKEN })
+  const decoded = verifyToken({ token, signature: process.env.TOKEN_SIGNATURE })
   const user = await userModel.findOne({
     email: decoded?.email,
     forgetCode: decoded?.sentCode,
@@ -179,7 +183,8 @@ export const resetPassword = async (req, res, next) => {
   }
 
   const { newPassword } = req.body
-  user.password = newPassword
+  const hashPassword = pkg.hashSync(newPassword, parseInt(process.env.SALT_ROUNDS))
+  user.password = hashPassword
   user.forgetCode = null
 
   const resetedPassData = await user.save()

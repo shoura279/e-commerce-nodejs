@@ -2,11 +2,11 @@ import { Router } from 'express'
 const router = Router()
 
 import * as cc from './category.contoller.js'
-import { multerCloudFunction } from '../../services/multerCloud.js'
-import { allowedExtensions } from '../../utils/allowedExtensions.js'
+import { fileUpload } from '../../utils/multerCloud.js'
+import { fileValidation } from '../../utils/allowedExtensions.js'
 import { asyncHandler } from '../../utils/errorhandling.js'
-import { validationCoreFunction } from '../../middlewares/validation.js'
-import { createCategorySchema, updateCategorySchema } from './category.validationSchemas.js'
+import { isValid } from '../../middlewares/validation.js'
+import * as val from './category.validationSchemas.js'
 import { isAuth } from '../../middlewares/auth.js'
 import { categoryRoles } from './category.endPointeRoles.js'
 
@@ -19,16 +19,16 @@ router.use(isAuth(categoryRoles.CREAT_CATEGPRY))
 // add category
 router.post(
   '/',
-  multerCloudFunction(allowedExtensions.Image).single('image'),
-  validationCoreFunction(createCategorySchema),
+  fileUpload(fileValidation.Image).single('image'),
+  isValid(val.createCategorySchema),
   asyncHandler(cc.createCategory),
 )
 
 // update category
 router.put(
   '/',
-  multerCloudFunction(allowedExtensions.Image).single('image'),
-  validationCoreFunction(updateCategorySchema),
+  fileUpload(fileValidation.Image).single('image'),
+  isValid(val.updateCategorySchema),
   asyncHandler(cc.updateCategory),
 )
 

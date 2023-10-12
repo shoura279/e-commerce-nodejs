@@ -1,22 +1,16 @@
-import Joi from 'joi'
+import joi from 'joi'
 import { generalFields } from '../../middlewares/validation.js'
 
 // create category schema
 export const createCategorySchema = {
-  body: Joi.object({
-    name: Joi.string().required(),
-  }),
-  file: Joi.object({
-    image: generalFields.file.required()
-  }).required()
+  body: joi.object({
+    name: joi.string().required(),
+  })
 }
 
 // update category schema
 export const updateCategorySchema = {
-  body: Joi.object({
-    name: Joi.string().required(),
+  body: joi.object({
+    name: joi.string().required(),
   }),
-  file: Joi.object({
-    image: generalFields.file.required()
-  }).required()
 }

@@ -13,7 +13,7 @@ export const addProduct = async (req, res, next) => {
   const { title, desc, colors, sizes, price, appliedDiscount, stock } = req.body
   const { categoryId, subCategoryId, brandId } = req.query
 
-  //=============================== Ids Checks======================
+  //=============================== Ids Checks ======================
   const category = await categoryModel.findById(categoryId)
   if (!category) {
     return next(new Error('invalid cat. Ids', { cause: 400 }))
@@ -34,8 +34,6 @@ export const addProduct = async (req, res, next) => {
     trim: true,
   })
 
-  const priceAfterDiscount = price * (1 - (appliedDiscount || 0) / 100)
-  
   //======================= Images ===============
   if (!req.files.length) {
     return next(new Error('please upload product images', { cause: 400 }))
@@ -62,12 +60,11 @@ export const addProduct = async (req, res, next) => {
     stock,
     price,
     appliedDiscount,
-    priceAfterDiscount,
-    // Images,''
+    Images,
     categoryId,
     subCategoryId,
     brandId,
-    // customId,
+    customId,
   }
   const productDb = await productModel.create(productObject)
   if (!productDb) {
@@ -167,7 +164,7 @@ export const updateProduct = async (req, res, next) => {
   await product.save()
   res.status(200).json({ message: 'Done', product })
 }
-
+// ================ get all product ====================
 export const listProducts = async (req, res, next) => {
   // // const { page, size } = req.query
   // const { page, size, sort, select, search, ...filter } = req.query
@@ -211,3 +208,39 @@ export const listProducts = async (req, res, next) => {
 }
 
 // gt|gte|lt|lte|in|nin|regex
+// ========================== get specific ===================
+export const getSpecific = async (req, res, next) => {
+  // data 
+  const { productId } = req.params
+  // check existence
+  const product = await productModel.findById(productId).populate([
+    { path: 'subCategoryId' },
+    { path: 'categoryId' },
+    { path: 'brandId' }
+  ])
+
+  if (!product) {
+    return next(new Error('not found', { cause: 400 }))
+  }
+
+}
+// ========================== deleteProduct ===================
+export const deleteProduct = async (req, res, next) => {
+  // data 
+  const { productId } = req.query
+  // check existence
+  const product = await productModel.findByIdAndDelete(productId)
+  if (!product) {
+    return next(new Error('product not found', { cause: 400 }))
+  }
+  const category = await categoryModel.findById(product.categoryId)
+  const subCategory = await subCategoryModel.findById(product.subCategoryId)
+  const brand = await brandModel.findById(product.brandId)
+  await cloudinary.api.delete_resources_by_prefix(
+    `${process.env.PROJECT_FOLDER}/Categories/${category.customId}/SubCategories/${subCategory.customId}/Brands/${brand.customId}/Proudcts/${product.customId}`
+  )
+  await cloudinary.api.delete_folder(
+    `${process.env.PROJECT_FOLDER}/Categories/${category.customId}/SubCategories/${subCategory.customId}/Brands/${brand.customId}/Proudcts/${product.customId}`
+  )
+  return res.status(200).json({ message: 'Deleted successfully' })
+}

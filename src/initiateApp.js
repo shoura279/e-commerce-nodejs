@@ -8,7 +8,7 @@ export const initiateApp = (express, app) => {
   const port = process.env.PORT || 5000
   // morgan
   if (process.env.NODE_ENV === 'dev') {
-    app.use(morgan('dev'))
+    app.use(morgan('tiny'))
   }
   app.use(express.json())
   connectionDB()
