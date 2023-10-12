@@ -13,11 +13,11 @@ const couponScehma = new Schema({
   expierdAt: Number,
   createdBy: {
     type: Types.ObjectId,
-    ref: 'User', 
+    ref: 'User',
     required: true
   }
 }, { timestamps: true })
 
 export const couponModel =
-  mongoose.models.Coupon ||
+  /*mongoose.models.Coupon||*/
   model('Coupon', couponScehma)

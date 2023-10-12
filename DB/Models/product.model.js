@@ -99,4 +99,5 @@ productSchema.methods.inStock = function (requiredQuantity) {
   return this.stock >= requiredQuantity ? true : false
 }
 export const productModel =
+  /*mongoose.models.Product||*/
   mongoose.model('Product', productSchema)

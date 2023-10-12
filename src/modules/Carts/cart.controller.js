@@ -13,25 +13,25 @@ export const addToCart = async (req, res, next) => {
   if (!productCheck.inStock(quantity)) {
     return next(new Error(`there are ${productCheck.stock} left in stock!`))
   }
-  const cart = await cartModel.findOneAndUpdate(
+  const isProductInCart = await cartModel.findOneAndUpdate(
     { userId, 'products.productId': productId },
-    { $push: { products: { productId, quantity } } })
-  if (cart) {
-    for (const product of cart.products) {
-      if (product.productId.toString() === productId.toString()) {
-        product.quantity = quantity
-        await cart.save()
-        return res.status(200).json({ message: 'quantity updated!' })
-      }
-    }
+    { $set: { 'products.$.quantity': quantity } }
+  )
+  if (!isProductInCart) {
+    await cartModel.findOneAndUpdate(
+      { userId },
+      {
+        $push: { products: { productId, quantity } }
+      })
   }
+
   return res.status(200).json({ message: "added successfully" })
 
 }
 
 // get user cart
 export const userCart = async (req, res, next) => {
-  const cart = await cartModel.findOneAndDelete({ userId: req.user._id }).populate({
+  const cart = await cartModel.findOne({ userId: req.user._id }).populate({
     path: 'products.productId',
     select: 'name '
   })

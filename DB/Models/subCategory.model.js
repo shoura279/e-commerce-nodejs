@@ -37,7 +37,7 @@ const subCategoryScehma = new mongoose.Schema(
     docModel: {
       type: String,
       required: true,
-      enum: ['Catgeory', 'Brand'],
+      enum: ['Category', 'Brand'],
     },
   },
   {
@@ -55,5 +55,5 @@ subCategoryScehma.virtual('brands', {
 })
 
 export const subCategoryModel =
-  // mongoose.models.SubCategory ||
+  /*mongoose.models.SubCategory||*/
   mongoose.model('SubCategory', subCategoryScehma)

@@ -43,4 +43,4 @@ orderSchema.virtual('finalPrice').get(function () {
     : this.price
 })
 // model
-export const orderModel = mongoose.models.Order || model('Order', orderSchema)
+export const orderModel = /*mongoose.models.Order ||*/ model('Order', orderSchema)

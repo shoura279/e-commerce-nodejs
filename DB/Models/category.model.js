@@ -44,7 +44,7 @@ categoryScehma.virtual('subCategories', {
   localField: '_id',
 })
 
-export const categoryModel = mongoose.model('Catgeory', categoryScehma)
+export const categoryModel = /*mongoose.models.Category||*/mongoose.model('Category', categoryScehma)
 
 
 
